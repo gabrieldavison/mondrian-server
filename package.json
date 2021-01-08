@@ -4,10 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel -d ./build ./src",
-    "prebuild": "rm -rf build/*",
-    "start": "node ./build/index.js",
-    "prestart": "npm build",
+    "start": "node -r esm ./src/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
