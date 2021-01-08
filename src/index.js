@@ -1,10 +1,10 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import { v4 as uuidv4 } from "uuid";
-import routes from "./routes";
-import models, { sequelize } from "./models";
-
+import pageRoute from "./routes/page";
+import boxRoute from "./routes/box";
+import createSeedData from "./utils/createSeedData";
+const db = require("./models/index");
 const app = express();
 
 app.use(cors());
@@ -13,15 +13,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(async (req, res, next) => {
   req.context = {
-    models,
-    me: await models.User.findByLogin("rwieruch"),
+    Page: db.Page,
+    Box: db.Box,
   };
   next();
 });
 
-app.use("/session", routes.session);
-app.use("/users", routes.user);
-app.use("/messages", routes.message);
+app.use("/pages", pageRoute);
+app.use("/boxes", boxRoute);
 
 app.get("*", (req, res, next) => {
   const error = new Error(`${req.ip} tried to access ${req.originalUrl}`);
@@ -36,45 +35,15 @@ app.use((error, req, res, next) => {
   }
   return res.status(error.statusCode).json({ error: error.toString() });
 });
+console.log(process.env.ERASE_DB, "erase");
 
-const eraseDatabaseOnSync = true;
+const eraseDatabaseOnSync = process.env.ERASE_DB === "true";
 
-const createUsersWithMessages = async () => {
-  await models.User.create(
-    {
-      username: "rwieruch",
-      messages: [
-        {
-          text: "This is a message.",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    }
-  );
+console.log(eraseDatabaseOnSync, "type");
 
-  await models.User.create(
-    {
-      username: "ddavids",
-      messages: [
-        {
-          text: "Happy to release ...",
-        },
-        {
-          text: "Published a complete ...",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    }
-  );
-};
-
-sequelize.sync({ force: eraseDatabaseOnSync }).then(() => {
+db.sequelize.sync({ force: eraseDatabaseOnSync }).then(() => {
   if (eraseDatabaseOnSync) {
-    createUsersWithMessages();
+    createSeedData();
   }
   app.listen(process.env.PORT, () =>
     console.log(`Example app listening on port ${process.env.PORT}!`)

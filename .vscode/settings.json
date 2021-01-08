@@ -1,0 +1,11 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "database": "${workspaceFolder:mondrian-server}/testdb.sqlite",
+      "name": "testdb"
+    }
+  ],
+  "sqltools.useNodeRuntime": true
+}

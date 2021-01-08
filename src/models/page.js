@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Page extends Model {
     /**
@@ -11,13 +9,28 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.Box, { onDelete: "CASCADE" });
     }
-  };
-  Page.init({
-    slug: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Page',
-  });
+  }
+  Page.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        unique: {
+          args: true,
+          msg: "name already in use!",
+        },
+
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+    },
+    {
+      sequelize,
+      modelName: "Page",
+    }
+  );
   return Page;
 };
