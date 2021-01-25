@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import pageRoute from "./routes/page";
 import boxRoute from "./routes/box";
+import boxCollectionRoute from "./routes/box-collection";
 import createSeedData from "./utils/createSeedData";
 const db = require("./models/index");
 const app = express();
@@ -21,6 +22,7 @@ app.use(async (req, res, next) => {
 
 app.use("/pages", pageRoute);
 app.use("/boxes", boxRoute);
+app.use("/box-collection", boxCollectionRoute);
 
 app.get("*", (req, res, next) => {
   const error = new Error(`${req.ip} tried to access ${req.originalUrl}`);

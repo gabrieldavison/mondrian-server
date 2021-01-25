@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { BadRequestError, NotFoundError } from "../utils/errors";
+import { authorizeBox } from "../middleware/auth";
 const router = Router();
 
 //Create box
-router.post("/", async (req, res) => {
+router.post("/", authorizeBox, async (req, res) => {
   const box = await req.context.Box.create(req.body).catch(
     (error) => new BadRequestError(error)
   );
@@ -29,7 +30,7 @@ router.get("/:boxId", async (req, res) => {
 });
 
 //Update box
-router.put("/:boxId", async (req, res) => {
+router.put("/:boxId", authorizeBox, async (req, res) => {
   const updatedBox = await req.context.Box.update(req.body, {
     where: {
       id: req.params.boxId,
@@ -39,9 +40,7 @@ router.put("/:boxId", async (req, res) => {
 });
 
 //Update multiple boxes, takes an array of boxes.
-router.put("/", async (req, res) => {
-  console.log("multiple boxes");
-  console.log(req.body);
+router.put("/", authorizeBox, async (req, res) => {
   const updatedBoxes = req.body.forEach(async (box) => {
     const updatedBox = await req.context.Box.update(box, {
       where: {
@@ -53,7 +52,7 @@ router.put("/", async (req, res) => {
 });
 
 //Delete box
-router.delete("/:boxId", async (req, res, next) => {
+router.delete("/:boxId", authorizeBox, async (req, res, next) => {
   const result = await req.context.Box.destroy({
     where: { id: req.params.boxId },
   }).catch(next);

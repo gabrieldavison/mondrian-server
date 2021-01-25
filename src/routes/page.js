@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { BadRequestError, NotFoundError } from "../utils/errors";
+import { NotFoundError } from "../utils/errors";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { authorizePage } from "../middleware/auth";
 
 const router = Router();
 
@@ -9,6 +12,33 @@ router.post("/", async (req, res, next) => {
     name: req.body.name,
   }).catch((error) => next(error));
   return res.send(page);
+});
+
+router.post("/:id", async (req, res, next) => {
+  const page = await req.context.Page.findOne({
+    attributes: ["name", "password"],
+    where: {
+      id: req.params.id,
+    },
+  });
+  const passwordMatch = await bcrypt.compare(req.body.password, page.password);
+  if (passwordMatch) {
+    let jwtToken = jwt.sign(
+      {
+        pageName: page.name,
+        id: page.id,
+      },
+      process.env.JWT_SECRET
+    );
+
+    return res.status(200).json({
+      token: jwtToken,
+    });
+  } else {
+    return res.status(401).json({
+      message: "Authentication failed",
+    });
+  }
 });
 
 //Get all pages or query pages based on ?param=param
@@ -52,6 +82,22 @@ router.put("/:pageId", async (req, res) => {
       id: req.params.pageId,
     },
   }).catch((error) => new NotFoundError(error));
+  return res.send(updatedPage);
+});
+
+//Update page (patch)
+router.patch("/:pageId", authorizePage, async (req, res) => {
+  //Hash password if there is one
+  if (req.body.password) {
+    req.body.password = await bcrypt.hash(req.body.password, 10);
+  }
+  console.log(req.body.password);
+  const updatedPage = await req.context.Page.update(req.body, {
+    where: {
+      id: req.params.pageId,
+    },
+  }).catch((error) => new NotFoundError(error));
+  console.log(updatedPage);
   return res.send(updatedPage);
 });
 
