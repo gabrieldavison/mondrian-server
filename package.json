@@ -12,10 +12,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.12.10",
-    "@babel/node": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
     "nodemon": "^2.0.6",
     "sequelize-cli": "^6.2.0"
   },
@@ -25,11 +21,8 @@
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
-    "human-readable-ids": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^8.5.1",
     "sequelize": "^6.3.5",
-    "sequelize-auto-migrations": "^1.0.3",
     "sqlite3": "^5.0.0",
     "uuid": "^8.3.2"
   }
