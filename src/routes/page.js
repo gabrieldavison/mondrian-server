@@ -15,6 +15,7 @@ router.post("/", async (req, res, next) => {
 });
 
 router.post("/:id", async (req, res, next) => {
+  console.log("unlock");
   const page = await req.context.Page.findOne({
     attributes: ["name", "password"],
     where: {
